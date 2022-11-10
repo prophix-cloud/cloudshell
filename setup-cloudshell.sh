@@ -8,10 +8,12 @@ cd ~
 mkdir -p ~/bin
 
 # Install 1pass cli
-curl -L https://cache.agilebits.com/dist/1P/op2/pkg/v2.7.3/op_linux_amd64_v2.7.3.zip -o 1pass.zip
-unzip 1pass.zip
-mv ~/op ~/bin/
-rm 1pass.zip op.sig
+if [[ ! -e $(which op) ]]; then
+    curl -L https://cache.agilebits.com/dist/1P/op2/pkg/v2.7.3/op_linux_amd64_v2.7.3.zip -o 1pass.zip
+    unzip 1pass.zip
+    mv ~/op ~/bin/
+    rm 1pass.zip op.sig
+fi
 
 echo "NOTE: You are about to sign into 1Password. It will first prompt you for the address to log into."
 echo "Use the following signin address: prophix-it.1password.com"
@@ -20,9 +22,11 @@ read
 eval $(op signin --account prophix-it.1password.com)
 
 # get ssh key from 1pass
-mkdir -p ~/.ssh
-op item get ssh-key --vault Private --field notesPlain --format json | jq -r '.value' > ~/.ssh/private_key
-chmod 644 ~/.ssh/private_key
+if [[ ! -e ~/.ssh/private_key ]]; then
+    mkdir -p ~/.ssh
+    op item get ssh-key --vault Private --field notesPlain --format json | jq -r '.value' > ~/.ssh/private_key
+    chmod 600 ~/.ssh/private_key
+fi
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/private_key
 
