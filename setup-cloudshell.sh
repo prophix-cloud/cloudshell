@@ -54,6 +54,8 @@ else
     echo "vim-plug already installed"
 fi
 
+mv -f ~/cloudshell/.vimrc ~/
+
 echo "Run the following commands to make git commands work:"
 echo 'eval $(ssh-agent -s)'
 echo 'ssh-add ~/.ssh/private_key'
