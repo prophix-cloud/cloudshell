@@ -55,6 +55,7 @@ else
 fi
 
 mv -f ~/cloudshell/.vimrc ~/
+mv -f ~/cloudshell/.bashrc ~/
 
 echo "Run the following commands to make git commands work:"
 echo 'eval $(ssh-agent -s)'
