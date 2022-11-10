@@ -53,3 +53,7 @@ if [[ ! -e ~/.vim/autoload/plug.vim ]]; then
 else
     echo "vim-plug already installed"
 fi
+
+echo "Run the following commands to make git commands work:"
+echo 'eval $(ssh-agent -s)'
+echo 'ssh-add ~/.ssh/private_key'
