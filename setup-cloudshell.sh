@@ -2,6 +2,8 @@
 
 set -euo pipefail
 
+TERRAFORM_VERSION="1.3.4"
+OP_VERSION="2.7.3"
 cd ~
 
 # should install binaries in $HOME/bin
@@ -9,10 +11,18 @@ mkdir -p ~/bin
 
 # Install 1pass cli
 if [[ ! -e $(which op) ]]; then
-    curl -L https://cache.agilebits.com/dist/1P/op2/pkg/v2.7.3/op_linux_amd64_v2.7.3.zip -o 1pass.zip
+    curl -L "https://cache.agilebits.com/dist/1P/op2/pkg/v${OP_VERSION}/op_linux_amd64_v${OP_VERSION}.zip" -o 1pass.zip
     unzip 1pass.zip
     mv ~/op ~/bin/
     rm 1pass.zip op.sig
+fi
+
+# Install terraform
+if [[ ! -e $(which terraform) ]]; then
+    curl -L "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
+    unzip terraform.zip
+    mv ~/terraform ~/bin/
+    rm terraform.zip
 fi
 
 # get ssh key from 1pass
