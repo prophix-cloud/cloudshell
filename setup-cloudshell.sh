@@ -30,13 +30,13 @@ fi
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/private_key
 
-# clone other repo's: cloud-ops, infrastrucutre
+# clone other repo's: cloud-ops, infrastructure
 if [[ ! -d ~/cloud-ops ]]; then
     git clone git@github.com:prophix-cloud/cloud-ops.git
 fi
 
-if [[ ! -d ~/infrastrucutre ]]; then
-    git clone git@github.com:prophix-cloud/infrastrucutre.git
+if [[ ! -d ~/infrastructure ]]; then
+    git clone git@github.com:prophix-cloud/infrastructure.git
 fi
 
 
