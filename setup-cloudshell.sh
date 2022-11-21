@@ -35,10 +35,10 @@ if [[ ! -e ~/.ssh/private_key ]]; then
 
     mkdir -p ~/.ssh
     op item get ssh-key --vault Private --field notesPlain --format json | jq -r '.value' > ~/.ssh/private_key
-    chmod 600 ~/.ssh/private_key
 else
     echo "ssh key already downloaded"
 fi
+chmod 600 ~/.ssh/private_key
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/private_key
 
