@@ -72,8 +72,8 @@ else
     echo "vim-plug already installed"
 fi
 
-mv -f ~/cloudshell/.vimrc ~/
-mv -f ~/cloudshell/.bashrc ~/
+cp ~/cloudshell/.vimrc ~/
+cp ~/cloudshell/.bashrc ~/
 
 echo "Run the following commands to make git commands work:"
 echo 'eval $(ssh-agent -s)'
