@@ -25,6 +25,14 @@ if [[ ! -e $(which terraform) ]]; then
     rm terraform.zip
 fi
 
+# Install terraformer https://github.com/GoogleCloudPlatform/terraformer
+if [[ ! -e $(which terraformer) ]]; then
+    export PROVIDER={aws,datadog}
+    curl -LO https://github.com/GoogleCloudPlatform/terraformer/releases/download/$(curl -s https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
+    chmod +x terraformer-${PROVIDER}-linux-amd64
+    mv terraformer-${PROVIDER}-linux-amd64 /usr/local/bin/terraformer
+fi
+
 # get ssh key from 1pass
 if [[ ! -e ~/.ssh/private_key ]]; then
     echo "NOTE: You are about to sign into 1Password. It will first prompt you for the address to log into."
