@@ -6,6 +6,9 @@ TERRAFORM_VERSION="1.3.4"
 OP_VERSION="2.7.3"
 cd ~
 
+# Install some base packages
+sudo yum install -y xz gzip file
+
 # should install binaries in $HOME/bin
 mkdir -p ~/bin
 
@@ -31,6 +34,15 @@ if [[ ! -e $(which terraformer) ]]; then
     curl -LO https://github.com/GoogleCloudPlatform/terraformer/releases/download/$(curl -s https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
     chmod +x terraformer-${PROVIDER}-linux-amd64
     mv terraformer-${PROVIDER}-linux-amd64 ~/bin/terraformer
+fi
+
+# Install tmate
+if [[ ! -e $(which tmate) ]]; then
+    curl -L "https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz" -o tmate.tar.xz
+    tar -xf tmate.tar.xz
+    rm tmate.tar.xz
+    mv ./tmate*/tmate ~/bin/
+    rm -rf ./tmate*
 fi
 
 # get ssh key from 1pass
