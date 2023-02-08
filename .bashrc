@@ -10,6 +10,6 @@ if [[ -d $HOME/bin ]]; then
 fi
 
 if [[ -e $(which terraform) ]]; then
-    export TF_CLI_CONFIG_FILE=$HOME/.terraform.d/plugin-cache
+    export TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache
     mkdir -p $HOME/.terraform.d/plugin-cache
 fi
