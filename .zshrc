@@ -15,6 +15,7 @@ autoload -Uz compinit && compinit
 export EDITOR='vim'
 export VISUAL='vim'
 alias ll="ls -lahF"
+alias v="vim"
 
 if [[ -d $HOME/bin ]]; then
     export PATH=$PATH:$HOME/bin
