@@ -7,9 +7,8 @@ set shiftwidth=4
 " always show line numbers
 set number
 
-" highlight current line and column
+" highlight current line
 set cursorline
-set cursorcolumn
 
 " Smart case searching
 set ignorecase
