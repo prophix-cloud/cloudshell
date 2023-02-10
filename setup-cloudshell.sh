@@ -86,6 +86,11 @@ else
     echo "oh-my-zsh already installed"
 fi
 
+# change remote url for this repo so user can update it
+pushd ~/cloudshell
+    git remote set-url origin git@github.com:prophix-cloud/cloudshell.git
+popd
+
 cp ~/cloudshell/.vimrc ~/
 cp ~/cloudshell/.bashrc ~/
 cp ~/cloudshell/.zshrc ~/
