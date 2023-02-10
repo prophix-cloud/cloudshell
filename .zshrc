@@ -25,3 +25,7 @@ if [[ -e $(which terraform) ]]; then
     export TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache
     mkdir -p $HOME/.terraform.d/plugin-cache
 fi
+
+echo "Run the following commands to make git commands work:"
+eval $(ssh-agent -s)
+ssh-add ~/.ssh/private_key

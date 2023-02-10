@@ -95,9 +95,9 @@ cp ~/cloudshell/.vimrc ~/
 cp ~/cloudshell/.bashrc ~/
 cp ~/cloudshell/.zshrc ~/
 
-echo '===================================================='
-echo '========================DONE========================'
-echo '====================================================\n\n'
+echo "===================================================="
+echo "========================DONE========================"
+echo "====================================================\n\n"
 echo "Run the following commands to make git commands work:"
 echo 'eval $(ssh-agent -s)'
 echo 'ssh-add ~/.ssh/private_key'
