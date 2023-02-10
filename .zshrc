@@ -1,13 +1,19 @@
-#allow tab completion in the middle of a word
-setopt COMPLETE_IN_WORD
 
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
+#oh-my-zsh config
 plugins=(terraform aws z git)
-
 ZSH_THEME="xiong-chiamiov-plus"
 DISABLE_UPDATE_PROMPT="true"
+
+#init oh-my-zsh
+source $ZSH/oh-my-zsh.sh
+
+#allow tab completion in the middle of a word
+setopt COMPLETE_IN_WORD
+# enable tab completion for git
+autoload -Uz compinit && compinit
 
 export EDITOR='vim'
 export VISUAL='vim'
