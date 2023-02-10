@@ -1,3 +1,6 @@
+#allow tab completion in the middle of a word
+setopt COMPLETE_IN_WORD
+
 # Path to your oh-my-zsh installation.
 export ZSH="$HOME/.oh-my-zsh"
 
