@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-TERRAFORM_VERSION="1.3.4"
-OP_VERSION="2.7.3"
 cd ~
 
 # Install some base packages
@@ -13,6 +11,8 @@ sudo yum install -y xz gzip file
 mkdir -p ~/bin
 
 # Install 1pass cli
+# https://app-updates.agilebits.com/product_history/CLI2
+OP_VERSION="2.7.3"
 if [[ ! -e $(which op) ]]; then
     curl -L "https://cache.agilebits.com/dist/1P/op2/pkg/v${OP_VERSION}/op_linux_amd64_v${OP_VERSION}.zip" -o 1pass.zip
     unzip 1pass.zip
@@ -21,6 +21,8 @@ if [[ ! -e $(which op) ]]; then
 fi
 
 # Install terraform
+# https://github.com/hashicorp/terraform/releases
+TERRAFORM_VERSION="1.3.8"
 if [[ ! -e $(which terraform) ]]; then
     curl -L "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
     unzip terraform.zip
@@ -62,7 +64,7 @@ chmod 600 ~/.ssh/private_key
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/private_key
 
-# clone other repo's: cloud-ops, infrastructure
+# clone other repo's: cloud-ops, infrastructure, etc.
 if [[ ! -d ~/cloud-ops ]]; then
     git clone git@github.com:prophix-cloud/cloud-ops.git
 else
@@ -75,18 +77,19 @@ else
     echo "infrastructure repo already cloned"
 fi
 
-
-#install vim-plug
-if [[ ! -e ~/.vim/autoload/plug.vim ]]; then
-    curl -fLo ~/.vim/autoload/plug.vim --create-dirs \
-        https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+if [[ ! -d ~/.oh-my-zsh ]]; then
+    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 else
-    echo "vim-plug already installed"
+    echo "oh-my-zsh already installed"
 fi
 
 cp ~/cloudshell/.vimrc ~/
 cp ~/cloudshell/.bashrc ~/
+cp ~/cloudshell/.zshrc ~/
 
+echo '===================================================='
+echo '========================DONE========================'
+echo '====================================================\n\n'
 echo "Run the following commands to make git commands work:"
 echo 'eval $(ssh-agent -s)'
 echo 'ssh-add ~/.ssh/private_key'

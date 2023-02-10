@@ -9,6 +9,11 @@ git clone https://github.com/prophix-cloud/cloudshell.git
 ./cloudshell/setup-cloudshell.sh
 ```
 
+Change your shell to zsh
+```
+zsh
+```
+
 ## Manually Starting SSH Agent
 
 ```
