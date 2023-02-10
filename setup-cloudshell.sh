@@ -78,6 +78,9 @@ else
 fi
 
 if [[ ! -d ~/.oh-my-zsh ]]; then
+    export CHSH='no'
+    export RUNZSH='no'
+    export KEEP_ZSHRC='yes'
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 else
     echo "oh-my-zsh already installed"
