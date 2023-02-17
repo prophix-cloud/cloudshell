@@ -49,6 +49,7 @@ fi
 
 # get ssh key from 1pass
 if [[ ! -e ~/.ssh/private_key ]]; then
+    echo "=========================================="
     echo "NOTE: You are about to sign into 1Password. It will first prompt you for the address to log into."
     echo "Use the following signin address: prophix-it.1password.com"
     echo "Press ENTER to continue..."
@@ -97,7 +98,7 @@ cp ~/cloudshell/.zshrc ~/
 
 echo "===================================================="
 echo "========================DONE========================"
-echo "====================================================\n\n"
+echo "===================================================="
 echo "Run the following commands to make git commands work:"
 echo 'eval $(ssh-agent -s)'
 echo 'ssh-add ~/.ssh/private_key'
