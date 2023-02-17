@@ -22,7 +22,7 @@ fi
 
 # Install terraform
 # https://github.com/hashicorp/terraform/releases
-TERRAFORM_VERSION="1.3.8"
+TERRAFORM_VERSION="1.3.9"
 if [[ ! -e $(which terraform) ]]; then
     curl -L "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
     unzip terraform.zip
