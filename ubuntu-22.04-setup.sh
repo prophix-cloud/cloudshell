@@ -20,8 +20,17 @@ sudo apt install \
     ripgrep \
     fzf
 
-mkdir -p $HOME/workspace/
+# Install terraform
+# https://github.com/hashicorp/terraform/releases
+TERRAFORM_VERSION="1.3.9"
+if [[ ! -e $(which terraform) ]]; then
+    curl -L "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
+    unzip terraform.zip
+    sudo mv $HOME/terraform /usr/local/bin
+    rm terraform.zip
+fi
 
+mkdir -p $HOME/workspace/
 pushd $HOME/workspace/
     if [[ ! -d $HOME/workspace/cloud-ops ]]; then
         git clone git@github.com:prophix-cloud/cloud-ops.git
