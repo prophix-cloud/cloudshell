@@ -19,3 +19,19 @@ sudo apt install \
     fd-find \
     ripgrep \
     fzf
+
+mkdir -p $HOME/workspace/
+
+pushd $HOME/workspace/
+    if [[ ! -d $HOME/workspace/cloud-ops ]]; then
+        git clone git@github.com:prophix-cloud/cloud-ops.git
+    else
+        echo "cloud-ops repo already cloned"
+    fi
+
+    if [[ ! -d $HOME/workspace/infrastructure ]]; then
+        git clone git@github.com:prophix-cloud/infrastructure.git
+    else
+        echo "infrastructure repo already cloned"
+    fi
+popd
