@@ -53,6 +53,7 @@ if [[ ! -e $(which podman) ]]; then
     curl -OL "https://github.com/containers/podman/releases/download/v${PODMAN_VERSION}/podman-remote-static-linux_amd64.tar.gz"
     tar xzf podman-remote-static-linux_amd64.tar.gz
     mv ~/bin/podman-* ~/bin/podman
+    rm podman-remote-static-linux_amd64.tar.gz
 fi
 
 # get ssh key from 1pass
