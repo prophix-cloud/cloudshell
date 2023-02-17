@@ -31,15 +31,16 @@ if [[ ! -e $(which terraform) ]]; then
     rm terraform.zip
 fi
 
-mkdir -p $HOME/workspace/
-pushd $HOME/workspace/
-    if [[ ! -d $HOME/workspace/cloud-ops ]]; then
+PX_WORKSPACE_DIR="$HOME/workspace/prophix"
+mkdir -p "$PX_WORKSPACE_DIR"
+pushd $HOME/workspace/prophix
+    if [[ ! -d "$PX_WORKSPACE_DIR/cloud-ops" ]]; then
         git clone git@github.com:prophix-cloud/cloud-ops.git
     else
         echo "cloud-ops repo already cloned"
     fi
 
-    if [[ ! -d $HOME/workspace/infrastructure ]]; then
+    if [[ ! -d "$PX_WORKSPACE_DIR/infrastructure" ]]; then
         git clone git@github.com:prophix-cloud/infrastructure.git
     else
         echo "infrastructure repo already cloned"
