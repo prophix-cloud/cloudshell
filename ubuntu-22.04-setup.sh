@@ -12,13 +12,14 @@ nvm install --lts
 nvm install node
 nvm ls
 
-sudo apt install \
+sudo apt install -y \
     shellcheck \
     bat \
     tree \
     fd-find \
     ripgrep \
-    fzf
+    fzf \
+    unzip
 
 # Install terraform
 # https://github.com/hashicorp/terraform/releases
@@ -26,7 +27,7 @@ TERRAFORM_VERSION="1.3.9"
 if [[ ! -e $(which terraform) ]]; then
     curl -L "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
     unzip terraform.zip
-    sudo mv $HOME/terraform /usr/local/bin
+    sudo mv ./terraform /usr/local/bin/
     rm terraform.zip
 fi
 
