@@ -43,5 +43,5 @@ Once the Windows Store says Ubuntu is installed, open the terminal app. It'll
 open into a Powershell session by default. You'll likely want to change the
 default to Ubuntu. You can open terminal settings using the shortcut `CTRL +
 ,`. The setting will be under `Startup > Default Profile`. Change it to "Ubuntu
-22.04.2 LTS". You may see a second entry with a similar name an a Linux penguin
-icon; ignore that one.
+22.04.2 LTS". You may see a second entry with a similar name and a Linux
+penguin icon; ignore that one.
