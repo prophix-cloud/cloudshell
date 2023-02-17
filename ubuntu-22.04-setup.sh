@@ -19,7 +19,8 @@ sudo apt install -y \
     fd-find \
     ripgrep \
     fzf \
-    unzip
+    unzip \
+    podman
 
 # Install terraform
 # https://github.com/hashicorp/terraform/releases
