@@ -13,3 +13,5 @@ if [[ -e $(which terraform) ]]; then
     export TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache
     mkdir -p $HOME/.terraform.d/plugin-cache
 fi
+
+echo "WARNING: You should use zsh, it has more tooling"
