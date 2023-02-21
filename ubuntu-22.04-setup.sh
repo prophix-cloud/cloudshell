@@ -22,7 +22,6 @@ sudo apt install -y \
     unzip \
     podman
 
-# Install terraform
 # https://github.com/hashicorp/terraform/releases
 TERRAFORM_VERSION="1.3.9"
 if [[ ! -e $(which terraform) ]]; then
@@ -32,8 +31,17 @@ if [[ ! -e $(which terraform) ]]; then
     rm terraform.zip
 fi
 
+if [[ ! -e $(which aws) ]]; then
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    unzip awscliv2.zip
+    sudo ./aws/install
+    rm -rf ./aws/
+    rm awscliv2.zip
+fi
+
 PX_WORKSPACE_DIR="$HOME/workspace/prophix"
 mkdir -p "$PX_WORKSPACE_DIR"
+
 pushd $HOME/workspace/prophix
     if [[ ! -d "$PX_WORKSPACE_DIR/cloud-ops" ]]; then
         git clone git@github.com:prophix-cloud/cloud-ops.git
