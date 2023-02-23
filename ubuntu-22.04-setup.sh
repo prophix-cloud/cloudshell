@@ -20,7 +20,8 @@ sudo apt install -y \
     ripgrep \
     fzf \
     unzip \
-    podman
+    podman \
+    jq
 
 # https://github.com/hashicorp/terraform/releases
 TERRAFORM_VERSION="1.3.9"
