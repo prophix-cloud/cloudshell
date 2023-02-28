@@ -21,6 +21,7 @@ sudo apt install -y \
     fzf \
     unzip \
     podman \
+    skopeo \
     jq
 
 # https://github.com/hashicorp/terraform/releases
