@@ -33,6 +33,14 @@ if [[ ! -e $(which terraform) ]]; then
     rm terraform.zip
 fi
 
+# Install terraformer https://github.com/GoogleCloudPlatform/terraformer
+if [[ ! -e $(which terraformer) ]]; then
+    export PROVIDER={aws,datadog}
+    curl -LO https://github.com/GoogleCloudPlatform/terraformer/releases/download/$(curl -s https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
+    chmod +x terraformer-${PROVIDER}-linux-amd64
+    mv terraformer-${PROVIDER}-linux-amd64 ~/bin/terraformer
+fi
+
 if [[ ! -e $(which aws) ]]; then
     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
     unzip awscliv2.zip
