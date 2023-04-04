@@ -5,7 +5,12 @@ set -euo pipefail
 cd ~
 
 # Install some base packages
-sudo yum install -y xz gzip file
+sudo yum install -y \
+    xz \
+    gzip \
+    file \
+    openssl \
+    nano
 
 # should install binaries in $HOME/bin
 mkdir -p ~/bin
