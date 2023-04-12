@@ -28,6 +28,8 @@ set wrapmargin=0
 set wrap
 set linebreak
 
+autocmd InsertEnter,InsertLeave * set cul!
+
 """"""""""""""""""""""""""""""""""""""""
 " Key Mappings
 """"""""""""""""""""""""""""""""""""""""

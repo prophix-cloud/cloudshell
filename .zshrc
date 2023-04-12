@@ -24,9 +24,13 @@ if [[ -d $HOME/bin ]]; then
 fi
 
 if [[ -e $(which terraform) ]]; then
-    export TF_PLUGIN_CACHE_DIR=$HOME/.terraform.d/plugin-cache
-    mkdir -p $HOME/.terraform.d/plugin-cache
+    export TF_PLUGIN_CACHE_DIR=/tmp/.terraform.d/plugin-cache
+    mkdir -p /tmp/.terraform.d/plugin-cache
 fi
+
+function get-temp-aws-creds() {
+    ~/cloudshell/get-temp-aws-creds.sh
+}
 
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/private_key
