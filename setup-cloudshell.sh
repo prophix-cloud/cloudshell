@@ -4,13 +4,15 @@ set -euo pipefail
 
 cd ~
 
-# Install some base packages
+echo "Installing base packages..."
 sudo yum install -y \
     xz \
     gzip \
     file \
     openssl \
-    nano
+    nano \
+    yum-utils \
+    shadow-utils 2&> /dev/null
 
 # should install binaries in $HOME/bin
 mkdir -p ~/bin
@@ -27,12 +29,9 @@ fi
 
 # Install terraform
 # https://github.com/hashicorp/terraform/releases
-TERRAFORM_VERSION="1.3.9"
 if [[ ! -e $(which terraform) ]]; then
-    curl -L "https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip" -o terraform.zip
-    unzip terraform.zip
-    mv ~/terraform ~/bin/
-    rm terraform.zip
+    sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+    sudo yum -y install terraform
 fi
 
 # Install terraformer https://github.com/GoogleCloudPlatform/terraformer
@@ -101,9 +100,9 @@ cp ~/cloudshell/.vimrc ~/
 cp ~/cloudshell/.bashrc ~/
 cp ~/cloudshell/.zshrc ~/
 
-echo "===================================================="
-echo "========================DONE========================"
-echo "===================================================="
-echo "Run the following commands to make git commands work:"
-echo 'eval $(ssh-agent -s)'
-echo 'ssh-add ~/.ssh/private_key'
+echo "Updating system packages..."
+sudo yum update -y 2&> /dev/null
+
+green=$(tput setaf 2)
+reset=$(tput sgr0)
+echo "${green}DONE${reset}"

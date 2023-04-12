@@ -34,3 +34,7 @@ function get-temp-aws-creds() {
 
 eval $(ssh-agent -s)
 ssh-add ~/.ssh/private_key
+
+pushd ~/cloudshell
+    ~/cloudshell/setup-cloudshell.sh
+popd
