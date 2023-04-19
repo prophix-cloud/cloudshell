@@ -10,13 +10,7 @@ SESSION_TOKEN=$(echo ${creds} | jq -r .Token)
 
 echo -ne "\nHere are your temporary credentials. Paste them in your shell.
 
-Linux Terminal:
 export AWS_ACCESS_KEY_ID='${ACCESS_KEY}'
 export AWS_SECRET_ACCESS_KEY='${SECRET_KEY}'
 export AWS_SESSION_TOKEN='${SESSION_TOKEN}'
-
-Windows Powershell Terminal:
-\$AWS_ACCESS_KEY_ID='${ACCESS_KEY}'
-\$AWS_SECRET_ACCESS_KEY='${SECRET_KEY}'
-\$AWS_SESSION_TOKEN='${SESSION_TOKEN}'
 \n"
