@@ -8,7 +8,12 @@ ACCESS_KEY=$(echo ${creds} | jq -r .AccessKeyId)
 SECRET_KEY=$(echo ${creds} | jq -r .SecretAccessKey)
 SESSION_TOKEN=$(echo ${creds} | jq -r .Token)
 
-echo -ne "\nHere are your temporary credentials. Paste them in your shell.
+yellow=$(tput setaf 3)
+reset=$(tput sgr0)
+
+echo -ne "\nHere are your temporary credentials. Paste them in your local shell.
+
+${yellow}These credentials are valid for ~15mins${reset}
 
 export AWS_ACCESS_KEY_ID='${ACCESS_KEY}'
 export AWS_SECRET_ACCESS_KEY='${SECRET_KEY}'
