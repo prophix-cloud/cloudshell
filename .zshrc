@@ -23,10 +23,9 @@ if [[ -d $HOME/bin ]]; then
     export PATH=$PATH:$HOME/bin
 fi
 
-if [[ -e $(which terraform) ]]; then
-    export TF_PLUGIN_CACHE_DIR=/tmp/.terraform.d/plugin-cache
-    mkdir -p /tmp/.terraform.d/plugin-cache
-fi
+# Always set tf plugin cache since it always gets cleared out in cloudshell
+export TF_PLUGIN_CACHE_DIR=/tmp/.terraform.d/plugin-cache
+mkdir -p /tmp/.terraform.d/plugin-cache
 
 function get-temp-aws-creds() {
     ~/cloudshell/get-temp-aws-creds.sh
