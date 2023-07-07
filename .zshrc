@@ -15,6 +15,9 @@ autoload -Uz compinit && compinit
 export EDITOR='vim'
 export VISUAL='vim'
 
+# stop aws cli from using less instead of outputting to stdout
+export AWS_PAGER=""
+
 alias ll="ls -lahF"
 alias v="vim"
 alias gap="git add -p"
