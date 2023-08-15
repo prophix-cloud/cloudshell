@@ -2,9 +2,17 @@
 
 set -euo pipefail
 
+read -r -p "Would you like to ensure all tools and repos are installed? 'No' will take you right to the prompt. [y/N] " response
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
+then
+    echo "Installing base packages..."
+else
+    echo "Not installing base packages. Can install them yourself by running the setup-cloudshell.sh script."
+    exit 0
+fi
+
 cd ~
 
-echo "Installing base packages..."
 sudo yum install -y \
     xz \
     gzip \
