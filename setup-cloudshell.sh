@@ -20,6 +20,7 @@ sudo yum install -y \
     openssl \
     nano \
     yum-utils \
+    golang \
     shadow-utils 2&> /dev/null
 
 # should install binaries in $HOME/bin
