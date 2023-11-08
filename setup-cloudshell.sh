@@ -105,9 +105,10 @@ pushd ~/cloudshell
     git remote set-url origin git@github.com:prophix-cloud/cloudshell.git
 popd
 
-cp ~/cloudshell/.vimrc ~/
-cp ~/cloudshell/.bashrc ~/
-cp ~/cloudshell/.zshrc ~/
+ln -sf ~/cloudshell/.vimrc ~/.vimrc
+ln -sf ~/cloudshell/.bashrc ~/.bashrc
+ln -sf ~/cloudshell/.zshrc ~/.zshrc
+ln -sf ~/cloudshell/.gitconfig ~/.gitconfig
 
 echo "Updating system packages..."
 sudo yum update -y 2&> /dev/null

@@ -1,0 +1,13 @@
+[init]
+    defaultBranch = main
+[alias]
+    co = checkout
+    ci = commit --signoff -v
+    commit = commit --signoff -v
+    dci = duet-commit -v --signoff
+    st = status
+    br = branch
+[push]
+    default = simple
+[merge]
+    conflictStyle = diff3
