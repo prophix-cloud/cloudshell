@@ -14,6 +14,8 @@ autoload -Uz compinit && compinit
 
 export EDITOR='vim'
 export VISUAL='vim'
+#Render colours correctly
+export COLORTERM=truecolor
 
 # stop aws cli from using less instead of outputting to stdout
 export AWS_PAGER=""
