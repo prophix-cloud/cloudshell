@@ -21,7 +21,7 @@ sudo yum install -y \
     nano \
     yum-utils \
     golang \
-    shadow-utils 2&> /dev/null
+    shadow-utils
 
 # should install binaries in $HOME/bin
 mkdir -p ~/bin
