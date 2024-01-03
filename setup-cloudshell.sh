@@ -43,14 +43,6 @@ if [[ ! -e $(which terraform) ]]; then
     sudo yum -y install terraform
 fi
 
-# Install terraformer https://github.com/GoogleCloudPlatform/terraformer
-if [[ ! -e $(which terraformer) ]]; then
-    export PROVIDER=all
-    curl -LO https://github.com/GoogleCloudPlatform/terraformer/releases/download/$(curl -s https://api.github.com/repos/GoogleCloudPlatform/terraformer/releases/latest | grep tag_name | cut -d '"' -f 4)/terraformer-${PROVIDER}-linux-amd64
-    chmod +x terraformer-${PROVIDER}-linux-amd64
-    mv terraformer-${PROVIDER}-linux-amd64 ~/bin/terraformer
-fi
-
 # Install tmate
 if [[ ! -e $(which tmate) ]]; then
     curl -L "https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz" -o tmate.tar.xz
