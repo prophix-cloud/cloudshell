@@ -38,10 +38,8 @@ fi
 
 # Install terraform
 # https://github.com/hashicorp/terraform/releases
-if [[ ! -e $(which terraform) ]]; then
-    sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-    sudo yum -y install terraform
-fi
+sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+sudo yum -y install terraform
 
 # Install tmate
 if [[ ! -e $(which tmate) ]]; then
