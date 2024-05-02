@@ -74,6 +74,7 @@ if [[ ! -d ~/cloud-ops ]]; then
 else
     echo "cloud-ops repo already cloned"
     pushd ~/cloud-ops
+        git checkout main
         git pull --rebase
     popd
 fi
@@ -83,6 +84,7 @@ if [[ ! -d ~/infrastructure ]]; then
 else
     echo "infrastructure repo already cloned"
     pushd ~/infrastructure
+        git checkout main
         git pull --rebase
     popd
 fi
@@ -92,6 +94,7 @@ if [[ ! -d ~/ops-terminal ]]; then
 else
     echo "ops-terminal repo already cloned"
     pushd ~/ops-terminal
+        git checkout main
         git pull --rebase
     popd
 fi
