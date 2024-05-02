@@ -73,12 +73,27 @@ if [[ ! -d ~/cloud-ops ]]; then
     git clone git@github.com:prophix-cloud/cloud-ops.git
 else
     echo "cloud-ops repo already cloned"
+    pushd ~/cloud-ops
+        git pull --rebase
+    popd
 fi
 
 if [[ ! -d ~/infrastructure ]]; then
     git clone git@github.com:prophix-cloud/infrastructure.git
 else
     echo "infrastructure repo already cloned"
+    pushd ~/infrastructure
+        git pull --rebase
+    popd
+fi
+
+if [[ ! -d ~/ops-terminal ]]; then
+    git clone git@github.com:prophix-cloud/ops-terminal.git
+else
+    echo "ops-terminal repo already cloned"
+    pushd ~/ops-terminal
+        git pull --rebase
+    popd
 fi
 
 if [[ ! -d ~/.oh-my-zsh ]]; then
