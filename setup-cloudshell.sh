@@ -108,6 +108,7 @@ fi
 # change remote url for this repo so user can update it
 pushd ~/cloudshell
     git remote set-url origin git@github.com:prophix-cloud/cloudshell.git
+    git pull --rebase
 popd
 
 ln -sf ~/cloudshell/.vimrc ~/.vimrc
@@ -117,7 +118,3 @@ ln -sf ~/cloudshell/.gitconfig ~/.gitconfig
 
 echo "Updating system packages..."
 sudo yum update -y 2&> /dev/null
-
-green=$(tput setaf 2)
-reset=$(tput sgr0)
-echo "${green}DONE${reset}"
