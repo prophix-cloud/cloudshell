@@ -1,7 +1,9 @@
 # Cloudshell Init Script
 
 This repo allows users to quickly setup an AWS Cloudshell with all the
-necessary tools to run terraform.
+necessary tools to run terraform. Cloudshell configuration is regional, so if
+you setup your Cloudshell in ca-central-1, that same setup won't exist in any
+other region that you open Cloudshell in.
 
 ## 1Pass Pre-req
 
@@ -26,3 +28,8 @@ Change your shell to zsh
 ```
 zsh
 ```
+
+## Getting Temporary AWS API Keys
+
+If your Cloudshell is setup you can run `get-temp-aws-creds` from the shell
+which will run `get-temp-aws-creds.sh` script that's in this repo.
