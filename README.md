@@ -32,4 +32,4 @@ zsh
 ## Getting Temporary AWS API Keys
 
 If your Cloudshell is setup you can run `get-temp-aws-creds` from the shell
-which will run `get-temp-aws-creds.sh` script that's in this repo.
+which will run the `get-temp-aws-creds.sh` script that's in this repo.
