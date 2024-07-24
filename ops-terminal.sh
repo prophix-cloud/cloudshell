@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-mkdir -p "~/.ops-terminal"
+configDir="~/ops-terminal.d"
+mkdir -p "${configDir}"
 
 bucket=""
 region="us-east-1"
@@ -21,18 +22,18 @@ currentVersion=$(aws s3api list-object-versions \
     --query 'Versions[?IsLatest].VersionId' \
     --output text)
 
-touch "~/.ops-terminal/last-version"
-lastLocalVersion=$(cat "~/.ops-terminal/last-version")
+touch "${configDir}/last-version"
+lastLocalVersion=$(cat "${configDir}/last-version")
 
 if [[ "${currentVersion}" != "${lastLocalVersion}" ]]; then
     aws s3 cp \
         "s3://${bucket}/ops-terminal" \
-        "~/.ops-terminal/" \
+        "${configDir}/" \
         --region "${region}"
 
-    chmod +x "~/.ops-terminal/ops-terminal"
-    echo "${currentVersion}" > "~/.ops-terminal/last-version"
+    chmod +x "${configDir}/ops-terminal"
+    echo "${currentVersion}" > "${configDir}/last-version"
 fi
 
 # Start the app
-~/.ops-terminal/ops-terminal
+${configDir}/ops-terminal
