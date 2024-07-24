@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-configDir="~/ops-terminal.d"
+configDir="~/.ops-terminal.d"
 mkdir -p "${configDir}"
 
 bucket=""
