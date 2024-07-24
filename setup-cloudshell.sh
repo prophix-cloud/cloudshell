@@ -3,11 +3,10 @@
 set -euo pipefail
 
 read -r -p "Would you like to ensure all tools and repos are installed? 'No' will take you right to the prompt. [y/N] " response
-if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]
-then
+if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
     echo "Installing base packages..."
 else
-    echo "Not installing base packages. Can install them yourself by running the setup-cloudshell.sh script."
+    echo "Not installing base packages. You can install them yourself by running the ./cloudshell/setup-cloudshell.sh script."
     exit 0
 fi
 
@@ -118,6 +117,7 @@ ln -sf ~/cloudshell/.vimrc ~/.vimrc
 ln -sf ~/cloudshell/.bashrc ~/.bashrc
 ln -sf ~/cloudshell/.zshrc ~/.zshrc
 ln -sf ~/cloudshell/.gitconfig ~/.gitconfig
+ln -sf ~/ops-terminal/ops-terminal.yml ~/ops-terminal.yml
 
 echo "Updating system packages..."
 sudo yum update -y 2&> /dev/null

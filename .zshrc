@@ -42,3 +42,7 @@ ssh-add ~/.ssh/private_key
 pushd ~/cloudshell
     ~/cloudshell/setup-cloudshell.sh
 popd
+
+function ops-terminal() {
+    ~/cloudshell/ops-terminal.sh
+}
