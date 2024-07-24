@@ -6,13 +6,16 @@ configDir="${HOME}/ops-terminal.d"
 mkdir -p "${configDir}"
 
 bucket=""
+env=""
 region="us-east-1"
 
 accountId=$(aws sts get-caller-identity --query "Account" --output text)
 if [[ "${accountId}" == "816621830681" ]]; then
     bucket="px-ops-terminal-uat"
+    env="uat"
 else
     bucket="px-ops-terminal-prod"
+    env="prod"
 fi
 
 currentVersion=$(aws s3api list-object-versions \
@@ -36,4 +39,4 @@ if [[ "${currentVersion}" != "${lastLocalVersion}" ]]; then
 fi
 
 # Start the app
-${configDir}/ops-terminal
+${configDir}/ops-terminal --env "${env}"
