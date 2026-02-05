@@ -1,39 +1,42 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 read -r -p "Would you like to ensure all tools and repos are installed? 'No' will take you right to the prompt. [y/N] " response
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
-    echo "Installing base packages..."
+  echo "Installing base packages..."
 else
-    echo "Not installing base packages. You can install them yourself by running the ./cloudshell/setup-cloudshell.sh script."
-    exit 0
+  echo "Not installing base packages. You can install them yourself by running the ./cloudshell/setup-cloudshell.sh script."
+  exit 0
 fi
 
 cd ~
 
-sudo yum install -y \
-    xz \
-    gzip \
-    file \
-    openssl \
-    nano \
-    yum-utils \
-    golang \
-    shadow-utils
-
-# should install binaries in $HOME/bin
-mkdir -p ~/bin
-
-# Install 1pass cli
-# https://app-updates.agilebits.com/product_history/CLI2
-OP_VERSION="2.7.3"
-if [[ ! -e $(which op) ]]; then
-    curl -L "https://cache.agilebits.com/dist/1P/op2/pkg/v${OP_VERSION}/op_linux_amd64_v${OP_VERSION}.zip" -o 1pass.zip
-    unzip 1pass.zip
-    mv ~/op ~/bin/
-    rm 1pass.zip op.sig
+# Pick a big, persistent workspace (defaults to /aws/mde/mde; fallback to /workspace)
+if [[ -d /aws/mde/mde ]]; then
+  WORKDIR="/aws/mde/mde/workspace"
+else
+  WORKDIR="/workspace"
 fi
+
+mkdir -p "$WORKDIR"
+echo "Using WORKDIR=$WORKDIR"
+
+# Base packages (include jq/unzip because script uses them elsewhere)
+sudo yum install -y \
+  xz \
+  gzip \
+  file \
+  openssl \
+  nano \
+  yum-utils \
+  golang \
+  shadow-utils \
+  jq \
+  unzip
+
+# Install small binaries in $HOME/bin
+mkdir -p ~/bin
+export PATH="$HOME/bin:$PATH"
 
 # Install terraform
 # https://github.com/hashicorp/terraform/releases
@@ -41,83 +44,102 @@ sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinu
 sudo yum -y install terraform
 
 # Install tmate
-if [[ ! -e $(which tmate) ]]; then
-    curl -L "https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz" -o tmate.tar.xz
-    tar -xf tmate.tar.xz
-    rm tmate.tar.xz
-    mv ./tmate*/tmate ~/bin/
-    rm -rf ./tmate*
+if ! command -v tmate >/dev/null 2>&1; then
+  tmpdir="$(mktemp -d)"
+  curl -L "https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz" -o "${tmpdir}/tmate.tar.xz"
+  tar -C "${tmpdir}" -xf "${tmpdir}/tmate.tar.xz"
+  mv "${tmpdir}"/tmate*/tmate ~/bin/
+  rm -rf "${tmpdir}"
 fi
 
-# get ssh key from 1pass
-if [[ ! -e ~/.ssh/private_key ]]; then
-    echo "=========================================="
-    echo "NOTE: You are about to sign into 1Password. It will first prompt you for the address to log into."
-    echo "Use the following signin address: prophix-it.1password.com"
-    echo "Press ENTER to continue..."
-    read
-    eval $(op signin --account prophix-it.1password.com)
-
-    mkdir -p ~/.ssh
-    op item get ssh-key --vault Private --field notesPlain --format json | jq -r '.value' > ~/.ssh/private_key
+# SSH key
+if [[ ! -f ~/.ssh/private_key ]]; then
+  echo "=========================================="
+  echo "~/.ssh/private_key was not found."
+  echo
+  echo "Create it manually, then re-run this script:"
+  echo
+  echo "  mkdir -p ~/.ssh"
+  echo "  nano ~/.ssh/private_key"
+  echo "  chmod 600 ~/.ssh/private_key"
+  echo
+  exit 1
 else
-    echo "ssh key already downloaded"
+  echo "ssh key already exists at ~/.ssh/private_key"
+  chmod 600 ~/.ssh/private_key
 fi
-chmod 600 ~/.ssh/private_key
-eval $(ssh-agent -s)
+
+eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/private_key
 
-# clone other repo's: cloud-ops, infrastructure, etc.
-if [[ ! -d ~/cloud-ops ]]; then
-    git clone git@github.com:prophix-cloud/cloud-ops.git
-else
-    echo "cloud-ops repo already cloned"
-    pushd ~/cloud-ops
-        git checkout main
-        git pull --rebase
-    popd
-fi
+clone_or_update() {
+  local name="$1"
+  local repo="$2"
+  local branch="${3:-main}"
+  local dest="$WORKDIR/$name"
 
-if [[ ! -d ~/infrastructure ]]; then
-    git clone git@github.com:prophix-cloud/infrastructure.git
-else
-    echo "infrastructure repo already cloned"
-    pushd ~/infrastructure
-        git checkout main
+  if [[ ! -d "$dest/.git" ]]; then
+    echo "Cloning $name into $dest..."
+    rm -rf "$dest"
+    git clone "$repo" "$dest"
+  else
+    echo "$name repo already cloned"
+    pushd "$dest" >/dev/null
+      git fetch origin --prune
+      git checkout -f "$branch"
+      # Only pull if clean; otherwise avoid failing the whole script
+      if git diff --quiet && git diff --cached --quiet; then
         git pull --rebase
-    popd
-fi
+      else
+        echo "NOTE: $name has local changes; skipping pull --rebase"
+      fi
+    popd >/dev/null
+  fi
 
-if [[ ! -d ~/ops-terminal ]]; then
-    git clone git@github.com:prophix-cloud/ops-terminal.git
-else
-    echo "ops-terminal repo already cloned"
-    pushd ~/ops-terminal
-        git checkout main
-        git pull --rebase
-    popd
-fi
+  # Convenience symlink from ~ to big disk
+  ln -sfn "$dest" "$HOME/$name"
+}
 
-if [[ ! -d ~/.oh-my-zsh ]]; then
-    export CHSH='no'
-    export RUNZSH='no'
-    export KEEP_ZSHRC='yes'
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+# Clone repos into big storage and link into ~
+clone_or_update "cloud-ops" "git@github.com:prophix-cloud/cloud-ops.git" "main"
+clone_or_update "infrastructure" "git@github.com:prophix-cloud/infrastructure.git" "main"
+clone_or_update "ops-terminal" "git@github.com:prophix-cloud/ops-terminal.git" "main"
+
+# Install Oh My Zsh on big storage, symlink into ~ (prevents small-home failures)
+OHMY_DIR="$WORKDIR/oh-my-zsh"
+if [[ ! -d "$OHMY_DIR/.git" ]]; then
+  echo "Cloning oh-my-zsh into $OHMY_DIR..."
+  rm -rf "$OHMY_DIR"
+  git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$OHMY_DIR"
 else
-    echo "oh-my-zsh already installed"
+  echo "oh-my-zsh already present in workspace"
+  pushd "$OHMY_DIR" >/dev/null
+    git fetch origin --prune || true
+    git checkout -f master || true
+    if git diff --quiet && git diff --cached --quiet; then
+      git pull --rebase || true
+    fi
+  popd >/dev/null
 fi
+ln -sfn "$OHMY_DIR" "$HOME/.oh-my-zsh"
 
 # change remote url for this repo so user can update it
-pushd ~/cloudshell
-    git remote set-url origin git@github.com:prophix-cloud/cloudshell.git
+# NOTE: skip pull if you have local changes
+pushd "$HOME/cloudshell" >/dev/null
+  git remote set-url origin git@github.com:prophix-cloud/cloudshell.git
+  if git diff --quiet && git diff --cached --quiet; then
     git pull --rebase
-popd
+  else
+    echo "NOTE: ~/cloudshell has local changes; skipping git pull --rebase"
+  fi
+popd >/dev/null
 
-ln -sf ~/cloudshell/.vimrc ~/.vimrc
-ln -sf ~/cloudshell/.bashrc ~/.bashrc
-ln -sf ~/cloudshell/.zshrc ~/.zshrc
-ln -sf ~/cloudshell/.gitconfig ~/.gitconfig
-ln -sf ~/ops-terminal/ops-terminal.yml ~/ops-terminal.yml
+# Link dotfiles/config into home
+ln -sf "$HOME/cloudshell/.vimrc" "$HOME/.vimrc"
+ln -sf "$HOME/cloudshell/.bashrc" "$HOME/.bashrc"
+ln -sf "$HOME/cloudshell/.zshrc" "$HOME/.zshrc"
+ln -sf "$HOME/cloudshell/.gitconfig" "$HOME/.gitconfig"
+ln -sf "$HOME/ops-terminal/ops-terminal.yml" "$HOME/ops-terminal.yml"
 
 echo "Updating system packages..."
-sudo yum update -y 2&> /dev/null
+sudo yum update -y &> /dev/null
