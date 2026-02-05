@@ -11,25 +11,25 @@ fi
 
 cd ~
 
-# Pick a big, persistent workspace
-WORKDIR=""
+# -------------------------
+# Workspace selection
+# -------------------------
+# In some CloudShell environments, $HOME is a small loop-mounted FS (~1G) and can run out of inodes fast.
+# /home is usually the larger ext4 FS (e.g., 16G). Prefer placing repos under /home/workspace/<user>.
+WORKDIR_BASE="/home/workspace"
+WORKDIR="${WORKDIR_BASE}/${USER:-cloudshell-user}"
 
-for candidate in "/aws/mde/mde/workspace" "/aws/mde/workspace" "$HOME/workspace"; do
-  if mkdir -p "$candidate" 2>/dev/null; then
-    WORKDIR="$candidate"
-    break
-  fi
-done
-
-if [[ -z "$WORKDIR" ]]; then
-  echo "ERROR: Could not create a workspace directory anywhere."
-  echo "Tried: /aws/mde/mde/workspace, /aws/mde/workspace, $HOME/workspace"
-  exit 1
-fi
+# Ensure it exists and is writable
+sudo mkdir -p "$WORKDIR"
+sudo chown "$(id -u)":"$(id -g)" "$WORKDIR"
+chmod 775 "$WORKDIR"
 
 echo "Using WORKDIR=$WORKDIR"
 
+# -------------------------
 # Base packages
+# -------------------------
+# Include jq/unzip because script uses them elsewhere
 sudo yum install -y \
   xz \
   gzip \
@@ -40,18 +40,22 @@ sudo yum install -y \
   golang \
   shadow-utils \
   jq \
-  unzip
+  unzip \
+  git
 
 # Install small binaries in $HOME/bin
 mkdir -p ~/bin
 export PATH="$HOME/bin:$PATH"
 
-# Install terraform
-# https://github.com/hashicorp/terraform/releases
+# -------------------------
+# Terraform
+# -------------------------
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
 sudo yum -y install terraform
 
-# Install tmate
+# -------------------------
+# tmate
+# -------------------------
 if ! command -v tmate >/dev/null 2>&1; then
   tmpdir="$(mktemp -d)"
   curl -L "https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz" -o "${tmpdir}/tmate.tar.xz"
@@ -60,7 +64,9 @@ if ! command -v tmate >/dev/null 2>&1; then
   rm -rf "${tmpdir}"
 fi
 
+# -------------------------
 # SSH key (manual)
+# -------------------------
 if [[ ! -f ~/.ssh/private_key ]]; then
   echo "=========================================="
   echo "~/.ssh/private_key was not found."
@@ -80,6 +86,9 @@ fi
 eval "$(ssh-agent -s)"
 ssh-add ~/.ssh/private_key
 
+# -------------------------
+# Helpers
+# -------------------------
 clone_or_update() {
   local name="$1"
   local repo="$2"
@@ -91,11 +100,10 @@ clone_or_update() {
     rm -rf "$dest"
     git clone "$repo" "$dest"
   else
-    echo "$name repo already cloned"
+    echo "$name repo already cloned in $dest"
     pushd "$dest" >/dev/null
       git fetch origin --prune
       git checkout -f "$branch"
-      # Only pull if clean; otherwise avoid failing the whole script
       if git diff --quiet && git diff --cached --quiet; then
         git pull --rebase
       else
@@ -104,39 +112,43 @@ clone_or_update() {
     popd >/dev/null
   fi
 
-  # Convenience symlink from ~ to workspace
+  # Convenience symlink from ~ to the workspace location
   ln -sfn "$dest" "$HOME/$name"
 }
 
-# Clone repos into workspace and link into ~
+
 clone_or_update "cloud-ops" "git@github.com:prophix-cloud/cloud-ops.git" "main"
 clone_or_update "infrastructure" "git@github.com:prophix-cloud/infrastructure.git" "main"
 clone_or_update "ops-terminal" "git@github.com:prophix-cloud/ops-terminal.git" "main"
 
-# Install Oh My Zsh on workspace, symlink into ~
-OHMY_DIR="$WORKDIR/oh-my-zsh"
-if [[ ! -d "$OHMY_DIR/.git" ]]; then
-  echo "Cloning oh-my-zsh into $OHMY_DIR..."
-  rm -rf "$OHMY_DIR"
-  git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$OHMY_DIR"
-else
-  echo "oh-my-zsh already present in workspace"
-  pushd "$OHMY_DIR" >/dev/null
-    git fetch origin --prune || true
-    git checkout -f master || true
-    if git diff --quiet && git diff --cached --quiet; then
-      git pull --rebase || true
-    fi
+# If ops-terminal clone succeeded but checkout failed previously, ensure working tree is repaired:
+if [[ -d "$WORKDIR/ops-terminal/.git" ]]; then
+  pushd "$WORKDIR/ops-terminal" >/dev/null
+    # If checkout is in a bad state, this restores to HEAD.
+    git status --porcelain >/dev/null 2>&1 || true
+    git restore --source=HEAD :/ >/dev/null 2>&1 || true
   popd >/dev/null
 fi
-ln -sfn "$OHMY_DIR" "$HOME/.oh-my-zsh"
 
-# change remote url for this repo so user can update it
-# NOTE: skip pull if you have local changes
+# -------------------------
+# Oh My Zsh (keep in $HOME; it’s not that big compared to vendor)
+# -------------------------
+if [[ ! -d ~/.oh-my-zsh ]]; then
+  export CHSH='no'
+  export RUNZSH='no'
+  export KEEP_ZSHRC='yes'
+  sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" || true
+else
+  echo "oh-my-zsh already installed"
+fi
+
+# -------------------------
+# cloudshell repo remote + update
+# -------------------------
 pushd "$HOME/cloudshell" >/dev/null
   git remote set-url origin git@github.com:prophix-cloud/cloudshell.git
   if git diff --quiet && git diff --cached --quiet; then
-    git pull --rebase
+    git pull --rebase || true
   else
     echo "NOTE: ~/cloudshell has local changes; skipping git pull --rebase"
   fi
@@ -150,4 +162,8 @@ ln -sf "$HOME/cloudshell/.gitconfig" "$HOME/.gitconfig"
 ln -sf "$HOME/ops-terminal/ops-terminal.yml" "$HOME/ops-terminal.yml"
 
 echo "Updating system packages..."
-sudo yum update -y &> /dev/null
+sudo yum update -y &> /dev/null || true
+
+echo
+echo "Done. Workspace is at: $WORKDIR"
+echo "If you still see 'No space left on device', check inodes with: df -ih \$HOME"
