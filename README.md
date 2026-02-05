@@ -5,29 +5,33 @@ necessary tools to run terraform. Cloudshell configuration is regional, so if
 you setup your Cloudshell in ca-central-1, that same setup won't exist in any
 other region that you open Cloudshell in.
 
-## 1Pass Pre-req (optional)
+## SSH Key Pre-req
 
-In order to fetch our private repos you need to add a secret to your 1Pass
-private vault called `ssh-key`. In the "notes" section of that secret add your
-ssh private key.
+In order to fetch our private repos you need to generate and link a SSH key to your Github account. You can generate an SSH key using 1Password or `ssh-keygen`.
 
-- [Generating an SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux)
+- [Generating an SSH key using 1Password](https://developer.1password.com/docs/ssh/manage-keys/)
+- [Generating an SSH key using ssh-keygen](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent?platform=linux)
 - [Adding your SSH key to your GitHub account](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account#adding-a-new-ssh-key-to-your-account)
 
 ## AWS Cloudshell Setup
 
-Copy your ssh key that you use for Github into AWS Cloudshell. It will be used
-to fetch our private Github repos:
+### SSH key (required for private repos)
 
-```
-mkdir ~/.ssh
+You need an SSH key available in CloudShell to clone our private GitHub repos.
+
+Create the key file:
+
+```bash
+mkdir -p ~/.ssh
 nano ~/.ssh/private_key
+chmod 600 ~/.ssh/private_key
 ```
+
 
 Run the following command to setup your AWS Cloudshell. It is safe to run this
 script multiple times.
 
-```
+```bash
 git clone https://github.com/prophix-cloud/cloudshell.git
 ./cloudshell/setup-cloudshell.sh
 ```
@@ -41,11 +45,11 @@ cloudshell prompt should look like this now:
 └─[$] <>
 ```
 
-## Getting Temporary AWS API Keys
+### Getting Temporary AWS API Keys
 
 If your Cloudshell is setup you can run `get-temp-aws-creds` from the shell
 which will run the `get-temp-aws-creds.sh` script that's in this repo.
 
-## Launching Ops-terminal
+### Launching Ops-terminal
 
 Run `ops-terminal`
