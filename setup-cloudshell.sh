@@ -11,17 +11,25 @@ fi
 
 cd ~
 
-# Pick a big, persistent workspace (defaults to /aws/mde/mde; fallback to /workspace)
-if [[ -d /aws/mde/mde ]]; then
-  WORKDIR="/aws/mde/mde/workspace"
-else
-  WORKDIR="/workspace"
+# Pick a big, persistent workspace
+WORKDIR=""
+
+for candidate in "/aws/mde/mde/workspace" "/aws/mde/workspace" "$HOME/workspace"; do
+  if mkdir -p "$candidate" 2>/dev/null; then
+    WORKDIR="$candidate"
+    break
+  fi
+done
+
+if [[ -z "$WORKDIR" ]]; then
+  echo "ERROR: Could not create a workspace directory anywhere."
+  echo "Tried: /aws/mde/mde/workspace, /aws/mde/workspace, $HOME/workspace"
+  exit 1
 fi
 
-mkdir -p "$WORKDIR"
 echo "Using WORKDIR=$WORKDIR"
 
-# Base packages (include jq/unzip because script uses them elsewhere)
+# Base packages
 sudo yum install -y \
   xz \
   gzip \
@@ -52,7 +60,7 @@ if ! command -v tmate >/dev/null 2>&1; then
   rm -rf "${tmpdir}"
 fi
 
-# SSH key
+# SSH key (manual)
 if [[ ! -f ~/.ssh/private_key ]]; then
   echo "=========================================="
   echo "~/.ssh/private_key was not found."
@@ -96,16 +104,16 @@ clone_or_update() {
     popd >/dev/null
   fi
 
-  # Convenience symlink from ~ to big disk
+  # Convenience symlink from ~ to workspace
   ln -sfn "$dest" "$HOME/$name"
 }
 
-# Clone repos into big storage and link into ~
+# Clone repos into workspace and link into ~
 clone_or_update "cloud-ops" "git@github.com:prophix-cloud/cloud-ops.git" "main"
 clone_or_update "infrastructure" "git@github.com:prophix-cloud/infrastructure.git" "main"
 clone_or_update "ops-terminal" "git@github.com:prophix-cloud/ops-terminal.git" "main"
 
-# Install Oh My Zsh on big storage, symlink into ~ (prevents small-home failures)
+# Install Oh My Zsh on workspace, symlink into ~
 OHMY_DIR="$WORKDIR/oh-my-zsh"
 if [[ ! -d "$OHMY_DIR/.git" ]]; then
   echo "Cloning oh-my-zsh into $OHMY_DIR..."
