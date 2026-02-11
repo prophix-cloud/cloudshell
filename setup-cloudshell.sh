@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-read -r -p "Would you like to ensure all tools and repos are installed? 'No' will take you right to the prompt. [y/N] " response
+read -r -p "Would you like to ensure all tools and repos are installed? 'No' will still setup repos/symlinks and take you right to the prompt. [y/N] " response
+DO_INSTALL=0
 if [[ "$response" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+  DO_INSTALL=1
   echo "Installing base packages..."
 else
-  echo "Not installing base packages. You can install them yourself by running the ./cloudshell/setup-cloudshell.sh script."
-  exit 0
+  echo "Skipping package/tool installs; continuing with repo + config wiring..."
 fi
 
 cd ~
@@ -25,21 +26,23 @@ df -hT /home || true
 df -ih "$HOME" || true
 echo
 
-sudo yum install -y \
-  xz gzip file openssl nano yum-utils golang shadow-utils jq unzip git
-
 mkdir -p ~/bin
 export PATH="$HOME/bin:$PATH"
 
-sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
-sudo yum -y install terraform
+if [[ "$DO_INSTALL" -eq 1 ]]; then
+  sudo yum install -y \
+    xz gzip file openssl nano yum-utils golang shadow-utils jq unzip git
 
-if ! command -v tmate >/dev/null 2>&1; then
-  tmpdir="$(mktemp -d)"
-  curl -L "https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz" -o "${tmpdir}/tmate.tar.xz"
-  tar -C "${tmpdir}" -xf "${tmpdir}/tmate.tar.xz"
-  mv "${tmpdir}"/tmate*/tmate ~/bin/
-  rm -rf "${tmpdir}"
+  sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+  sudo yum -y install terraform
+
+  if ! command -v tmate >/dev/null 2>&1; then
+    tmpdir="$(mktemp -d)"
+    curl -L "https://github.com/tmate-io/tmate/releases/download/2.4.0/tmate-2.4.0-static-linux-amd64.tar.xz" -o "${tmpdir}/tmate.tar.xz"
+    tar -C "${tmpdir}" -xf "${tmpdir}/tmate.tar.xz"
+    mv "${tmpdir}"/tmate*/tmate ~/bin/
+    rm -rf "${tmpdir}"
+  fi
 fi
 
 # SSH key (manual)
@@ -55,8 +58,11 @@ if [[ ! -f ~/.ssh/private_key ]]; then
 fi
 chmod 600 ~/.ssh/private_key
 
-eval "$(ssh-agent -s)"
-ssh-add ~/.ssh/private_key
+# Start agent + add key (always)
+if ! ssh-add -l >/dev/null 2>&1; then
+  eval "$(ssh-agent -s)"
+fi
+ssh-add ~/.ssh/private_key >/dev/null
 
 clone_or_update() {
   local name="$1"
@@ -108,8 +114,19 @@ ln -sf "$HOME/cloudshell/.zshrc" "$HOME/.zshrc"
 ln -sf "$HOME/cloudshell/.gitconfig" "$HOME/.gitconfig"
 ln -sf "$HOME/ops-terminal/ops-terminal.yml" "$HOME/ops-terminal.yml"
 
-echo "Updating system packages..."
-sudo yum update -y &> /dev/null || true
+# Ensure ops-terminal always finds its config (even if invoked from elsewhere)
+cat > "$HOME/bin/ops-terminal" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$HOME"
+exec "$HOME/ops-terminal/ops-terminal" "$@"
+EOF
+chmod +x "$HOME/bin/ops-terminal"
+
+if [[ "$DO_INSTALL" -eq 1 ]]; then
+  echo "Updating system packages..."
+  sudo yum update -y &> /dev/null || true
+fi
 
 echo
 echo "Done."
